@@ -1,0 +1,98 @@
+{
+  "fingerprint": {
+    "closes": "1245901319383637804",
+    "volumes": "11114851772010458063",
+    "closes_eval": "17821051128395523445",
+    "ffr": "16847710333882868284",
+    "cpi_econ": "17764072682576794214",
+    "macro_raw": "4366041722122879245",
+    "fama_french_raw": "10992179986006789775"
+  },
+  "metrics": {
+    "SPY": {
+      "Return": 0.10836817362382956,
+      "Volatility": 0.19386054759170293,
+      "Sharpe Ratio (FFR)": 0.46264803983741604,
+      "Arithmetic Sharpe": 0.5401322274017532,
+      "Max Drawdown": 0.5518945143300028,
+      "Turnover": 1.3902375557658955e-09,
+      "Consistency": 0.3830570969857701
+    },
+    "AGG": {
+      "Return": 0.031457403579938426,
+      "Volatility": 0.05313993198974041,
+      "Sharpe Ratio (FFR)": 0.26485891439681697,
+      "Arithmetic Sharpe": 0.2896863450740167,
+      "Max Drawdown": 0.18432911895137755,
+      "Turnover": 1.5965183291866196e-09,
+      "Consistency": 0.33880166449648613
+    },
+    "GLD": {
+      "Return": 0.10592482225156163,
+      "Volatility": 0.178760670196419,
+      "Sharpe Ratio (FFR)": 0.48828988999315054,
+      "Arithmetic Sharpe": 0.5578659083417428,
+      "Max Drawdown": 0.4555501273425708,
+      "Turnover": 1.154380950996479e-09,
+      "Consistency": 0.32007086264789425
+    },
+    "60/40": {
+      "Return": 0.08146042940888143,
+      "Volatility": 0.11348629611333824,
+      "Sharpe Ratio (FFR)": 0.5572031851319242,
+      "Arithmetic Sharpe": 0.5970888485666533,
+      "Max Drawdown": 0.3372165601890817,
+      "Turnover": 0.03430529354900226,
+      "Consistency": 0.638374719183791
+    },
+    "50/30/20": {
+      "Return": 0.090658648171839,
+      "Volatility": 0.10307918442819594,
+      "Sharpe Ratio (FFR)": 0.7011903539355971,
+      "Arithmetic Sharpe": 0.7287367954364461,
+      "Max Drawdown": 0.2711932815600342,
+      "Turnover": 0.04029727645728267,
+      "Consistency": 0.6864154416282667
+    },
+    "60/40 VC": {
+      "Return": 0.07052506672520376,
+      "Volatility": 0.07374381157233101,
+      "Sharpe Ratio (FFR)": 0.7117051858332807,
+      "Arithmetic Sharpe": 0.7306395820406213,
+      "Max Drawdown": 0.1693425647010519,
+      "Turnover": 0.8499911984284356,
+      "Consistency": 0.954857864413465
+    },
+    "50/30/20 VC": {
+      "Return": 0.07763253846336915,
+      "Volatility": 0.07288424840876896,
+      "Sharpe Ratio (FFR)": 0.8159725349073478,
+      "Arithmetic Sharpe": 0.8293998895829223,
+      "Max Drawdown": 0.15854160068187412,
+      "Turnover": 0.7901852131441109,
+      "Consistency": 0.7465037446418948
+    },
+    "Markowitz": {
+      "Return": 0.11554119525076412,
+      "Volatility": 0.0895282969920675,
+      "Sharpe Ratio (FFR)": 1.0805671793477798,
+      "Arithmetic Sharpe": 1.0767934838098028,
+      "Max Drawdown": 0.18072322123657117,
+      "Turnover": 2.8449970226406514,
+      "Consistency": 1.303501555582624
+    },
+    "Simple Markowitz": {
+      "Return": 0.10370085820174557,
+      "Volatility": 0.09320111385549064,
+      "Sharpe Ratio (FFR)": 0.9130850497789289,
+      "Arithmetic Sharpe": 0.9233412254455869,
+      "Max Drawdown": 0.15845248564983247,
+      "Turnover": 2.788748078132516,
+      "Consistency": 1.046007969903871
+    }
+  },
+  "mean_cosine": {
+    "Markowitz": 0.36060117016333376,
+    "Simple Markowitz": 0.4343045071123296
+  }
+}

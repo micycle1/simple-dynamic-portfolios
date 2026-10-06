@@ -91,3 +91,10 @@ uv sync
 uv run python -m unittest discover -s tests
 uv run python examples/second_universe.py
 ```
+
+Once the notebook has downloaded the paper's data,
+`tests/regression/test_paper_notebook.py` also runs the notebook's own code
+through the evaluation and checks the headline numbers against
+`tests/regression/paper_headline.json`: to solver precision on the paper's data
+snapshot, and to within 0.005 on any other download. Without the data (as in
+CI) it is skipped. CI runs the tests on Python 3.13 and 3.14.
