@@ -12,7 +12,7 @@ Run from the repository root::
 import numpy as np
 import pandas as pd
 
-import sbg_portfolios as sbg
+import simple_dynamic_portfolios as sdp
 
 ASSETS = ["equity_us", "equity_em", "treasury", "credit", "commodity"]
 ANNUAL_VOLS = np.array([0.16, 0.22, 0.06, 0.08, 0.20])
@@ -25,7 +25,7 @@ CORRELATION = np.array([
 ])
 
 
-def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sbg.MarketInputs, pd.DataFrame]:
+def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sdp.MarketInputs, pd.DataFrame]:
     """Correlated daily returns with a slowly varying, partly predictable drift."""
     rng = np.random.default_rng(seed)
     dates = pd.bdate_range("2010-01-04", periods=n_days, name="date")
@@ -42,41 +42,41 @@ def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sbg.MarketInput
     features["macro_state"] = regime
     for asset in ASSETS:
         features[f"trend_126d[{asset}]"] = prices[asset].pct_change(126, fill_method=None)
-    return sbg.MarketInputs(prices, cash), features
+    return sdp.MarketInputs(prices, cash), features
 
 
-def ewma_covariance(prices: pd.DataFrame, halflife: int = 63) -> sbg.CovarianceHistory:
+def ewma_covariance(prices: pd.DataFrame, halflife: int = 63) -> sdp.CovarianceHistory:
     """An externally prepared covariance history (here, an EWMA estimate)."""
     covariances = prices.pct_change(fill_method=None).dropna().ewm(halflife=halflife).cov()
     covariances.index.names = ["date", "asset"]
-    return sbg.CovarianceHistory(covariances.dropna())
+    return sdp.CovarianceHistory(covariances.dropna())
 
 
-def run_example(n_days: int = 3000) -> dict[str, sbg.StrategyResult]:
+def run_example(n_days: int = 3000) -> dict[str, sdp.StrategyResult]:
     """Forecast, estimate risk, allocate, simulate, and evaluate."""
     market, features = synthetic_inputs(n_days)
     start = market.total_return_prices.index[400]  # after model warm-up
-    baseline = sbg.StaticBaseline(pd.Series({
+    baseline = sdp.StaticBaseline(pd.Series({
         "equity_us": 0.40, "equity_em": 0.10, "treasury": 0.35, "credit": 0.15,
     }))  # commodity is investable but has a zero baseline weight
-    initial = sbg.InitialPortfolio.from_values(
+    initial = sdp.InitialPortfolio.from_values(
         pd.Series({"equity_us": 60_000.0, "treasury": 30_000.0}), cash_value=10_000.0)
-    config = sbg.MarkowitzConfig(annual_vol_target=0.08, relative_l1_radius=0.5,
+    config = sdp.MarkowitzConfig(annual_vol_target=0.08, relative_l1_radius=0.5,
                                 rebalance_frequency="M", objective_horizon_days=21)
 
     results = {
-        "ridge + rolling risk": sbg.run_markowitz_with_models(
+        "ridge + rolling risk": sdp.run_markowitz_with_models(
             market, baseline,
-            alpha_model=sbg.RidgeAlpha(horizon_days=21, max_history=504, min_window=126),
-            risk_model=sbg.RollingSampleCovariance(window=63),
+            alpha_model=sdp.RidgeAlpha(horizon_days=21, max_history=504, min_window=126),
+            risk_model=sdp.RollingSampleCovariance(window=63),
             features=features, config=config, initial_portfolio=initial, start=start),
-        "ewma + prepared covariance": sbg.run_markowitz(
+        "ewma + prepared covariance": sdp.run_markowitz(
             market, baseline,
-            alpha=sbg.EwmaAlpha(halflife=126).forecast(market.total_return_prices),
+            alpha=sdp.EwmaAlpha(halflife=126).forecast(market.total_return_prices),
             risk=ewma_covariance(market.total_return_prices),
             config=config, initial_portfolio=initial, start=start),
-        "baseline": sbg.run_fixed_weight(market, baseline, rebalance_frequency="Q", start=start),
-        "baseline vol-controlled": sbg.run_vol_controlled_fixed_weight(
+        "baseline": sdp.run_fixed_weight(market, baseline, rebalance_frequency="Q", start=start),
+        "baseline vol-controlled": sdp.run_vol_controlled_fixed_weight(
             market, baseline, annual_vol_target=0.08, vol_window=63, start=start),
     }
     return results

@@ -6,7 +6,7 @@ import cvxpy as cp
 import numpy as np
 import pandas as pd
 
-from sbg_portfolios.optimizer import (
+from simple_dynamic_portfolios.optimizer import (
     AnchoredVolControlPortfolioConstructor,
     SolverError,
     solve_for_weights,

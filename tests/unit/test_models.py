@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from sbg_portfolios import (
+from simple_dynamic_portfolios import (
     AlphaForecasts,
     CovarianceHistory,
     EwmaAlpha,
@@ -13,7 +13,7 @@ from sbg_portfolios import (
     RidgeAlpha,
     RollingSampleCovariance,
 )
-from sbg_portfolios.alpha import ridge_forecast_history
+from simple_dynamic_portfolios.alpha import ridge_forecast_history
 
 
 def random_market(n_days: int = 400, n_assets: int = 3, seed: int = 0):

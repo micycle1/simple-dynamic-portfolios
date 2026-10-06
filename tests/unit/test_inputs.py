@@ -5,7 +5,12 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from sbg_portfolios import InitialPortfolio, MarketInputs, MarkowitzConfig, StaticBaseline
+from simple_dynamic_portfolios import (
+    InitialPortfolio,
+    MarketInputs,
+    MarkowitzConfig,
+    StaticBaseline,
+)
 
 DATES = pd.bdate_range("2020-01-01", periods=6)
 

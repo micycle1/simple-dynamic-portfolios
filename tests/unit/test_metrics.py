@@ -5,8 +5,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from sbg_portfolios import BacktestResults, arithmetic_sharpe, compute_metrics
-from sbg_portfolios import geometric_excess_sharpe
+from simple_dynamic_portfolios import BacktestResults, arithmetic_sharpe, compute_metrics
+from simple_dynamic_portfolios import geometric_excess_sharpe
 
 
 def results(daily_return: float = 4e-4, n_days: int = 253, seed: int = 1) -> BacktestResults:

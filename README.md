@@ -1,12 +1,17 @@
-# Stock/Bond/Gold Portfolios
+# Simple Dynamic Portfolios
 
-A small, DataFrame-first library for anchored, volatility-limited Markowitz
-portfolios, extracted from the reference implementation of
+A small, DataFrame-first library for simple dynamic portfolios over any
+universe of assets: a strategic baseline mix, adjusted at each rebalance by an
+anchored, volatility-limited Markowitz problem driven by return forecasts and a
+risk model. It generalizes the reference implementation of
 [*Simple Dynamic Stock/Bond/Gold Portfolios*](https://stanford.edu/~boyd/papers/stock_bond_gold_portfolios.html)
-([cvxgrp/simple-portfolio-code](https://github.com/cvxgrp/simple-portfolio-code)).
+([cvxgrp/simple-portfolio-code](https://github.com/cvxgrp/simple-portfolio-code)),
+whose SPY/AGG/GLD results it reproduces (see
+[the paper example](#the-paper-as-an-example)).
 
 The library accepts prepared pandas inputs and configuration only: no downloads,
-file paths, or ticker-specific logic. It contains
+file paths, or ticker-specific logic, so the assets, baseline, forecasts, and
+risk model are all yours to choose. It contains
 
 - the anchored volatility-limited Markowitz optimizer (CVXPY),
 - ridge and EWMA return forecasts,
@@ -32,25 +37,25 @@ maximum risky exposure, `s` the bid-ask spread, and `rho` the anchor radius
 
 ```python
 import pandas as pd
-import sbg_portfolios as sbg
+import simple_dynamic_portfolios as sdp
 
-result = sbg.run_markowitz(
-    market=sbg.MarketInputs(total_return_prices=prices, cash_returns=daily_cash_returns),
-    baseline=sbg.StaticBaseline(pd.Series({"stocks": 0.5, "bonds": 0.3, "gold": 0.2})),
-    alpha=sbg.AlphaForecasts(expected_21d_returns, horizon_days=21),
-    risk=sbg.CovarianceHistory(daily_covariances),  # or a FactorRiskHistory
-    config=sbg.MarkowitzConfig(annual_vol_target=0.07, relative_l1_radius=1.0),
-    initial_portfolio=None,  # all cash; or sbg.InitialPortfolio.from_values(...)
+result = sdp.run_markowitz(
+    market=sdp.MarketInputs(total_return_prices=prices, cash_returns=daily_cash_returns),
+    baseline=sdp.StaticBaseline(pd.Series({"stocks": 0.5, "bonds": 0.3, "gold": 0.2})),
+    alpha=sdp.AlphaForecasts(expected_21d_returns, horizon_days=21),
+    risk=sdp.CovarianceHistory(daily_covariances),  # or a FactorRiskHistory
+    config=sdp.MarkowitzConfig(annual_vol_target=0.07, relative_l1_radius=1.0),
+    initial_portfolio=None,  # all cash; or sdp.InitialPortfolio.from_values(...)
 )
 result.evaluate(cash_reference=daily_cash_returns)
 ```
 
 Alpha and risk inputs can instead come from the built-in models, e.g.
-`sbg.RidgeAlpha(...).forecast(prices, features)` and
-`sbg.RollingSampleCovariance(window=...).estimate(prices)`, or
-`sbg.run_markowitz_with_models(...)`. Fixed-weight and volatility-controlled
-fixed-weight benchmarks are available as `sbg.run_fixed_weight` and
-`sbg.run_vol_controlled_fixed_weight`.
+`sdp.RidgeAlpha(...).forecast(prices, features)` and
+`sdp.RollingSampleCovariance(window=...).estimate(prices)`, or
+`sdp.run_markowitz_with_models(...)`. Fixed-weight and volatility-controlled
+fixed-weight benchmarks are available as `sdp.run_fixed_weight` and
+`sdp.run_vol_controlled_fixed_weight`.
 
 Conventions:
 

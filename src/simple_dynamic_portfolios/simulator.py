@@ -1,7 +1,7 @@
 """Untaxed portfolio backtest simulator.
 
 Array-based and positional: callers are responsible for aligning assets and
-dates (``sbg_portfolios.data`` does this for labelled inputs). The daily event
+dates (``simple_dynamic_portfolios.data`` does this for labelled inputs). The daily event
 order is, for each observation ``i``:
 
 1. Accrue cash at ``ffrs[i]`` (a daily decimal return).
@@ -22,7 +22,7 @@ Compatibility characteristics preserved from the paper implementation:
 - A forced liquidation on a day *without* a rebalance reduces that day's
   recorded NAV by its cost, but the cost is not debited from cash, so it does
   not persist. Rebalance days do persist it. Labelled inputs built through
-  ``sbg_portfolios.data`` require a complete price panel, so this path is
+  ``simple_dynamic_portfolios.data`` require a complete price panel, so this path is
   only reachable through ``BacktestData.from_pandas`` directly.
 """
 
