@@ -68,6 +68,23 @@ Conventions:
 [`examples/second_universe.py`](examples/second_universe.py) runs the library
 end to end on a synthetic five-asset universe.
 
+## The paper as an example
+
+[`notebooks/paper_example.ipynb`](notebooks/paper_example.ipynb) rebuilds the
+paper's SPY/AGG/GLD results step by step with this API: forecasts, risk,
+Markowitz and benchmark backtests, the evaluation table, forecast accuracy (the
+paper's Figure 7), the constraints at each decision, and variations of anchor
+radius, initial portfolio, risk model, and volatility limit. It is saved with
+its outputs (interactive plotly figures), so it can be read without running it.
+
+Its input data is not distributed here. Running it needs the `data/` folder
+written by `scripts/1_download_data.py` and
+`scripts/2_download_evaluation_data.py` in
+[cvxgrp/simple-portfolio-code](https://github.com/cvxgrp/simple-portfolio-code),
+copied into this repository or pointed to by the `SBG_DATA` environment
+variable. `uv sync` installs the notebook's dependencies (ipykernel, plotly,
+pyarrow) in the development group.
+
 ## Install and test
 
 ```bash
