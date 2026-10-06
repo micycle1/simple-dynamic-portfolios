@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from simple_portfolio.simulator import BacktestData, rebalance_schedule, run_backtest
+from sbg_portfolios.simulator import BacktestData, rebalance_schedule, run_backtest
 
 SPREAD = 1e-3
 

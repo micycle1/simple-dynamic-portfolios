@@ -1,4 +1,4 @@
-# simple-portfolio
+# Stock/Bond/Gold Portfolios
 
 A small, DataFrame-first library for anchored, volatility-limited Markowitz
 portfolios, extracted from the reference implementation of
@@ -32,25 +32,25 @@ maximum risky exposure, `s` the bid-ask spread, and `rho` the anchor radius
 
 ```python
 import pandas as pd
-import simple_portfolio as sp
+import sbg_portfolios as sbg
 
-result = sp.run_markowitz(
-    market=sp.MarketInputs(total_return_prices=prices, cash_returns=daily_cash_returns),
-    baseline=sp.StaticBaseline(pd.Series({"stocks": 0.5, "bonds": 0.3, "gold": 0.2})),
-    alpha=sp.AlphaForecasts(expected_21d_returns, horizon_days=21),
-    risk=sp.CovarianceHistory(daily_covariances),  # or a FactorRiskHistory
-    config=sp.MarkowitzConfig(annual_vol_target=0.07, relative_l1_radius=1.0),
-    initial_portfolio=None,  # all cash; or sp.InitialPortfolio.from_values(...)
+result = sbg.run_markowitz(
+    market=sbg.MarketInputs(total_return_prices=prices, cash_returns=daily_cash_returns),
+    baseline=sbg.StaticBaseline(pd.Series({"stocks": 0.5, "bonds": 0.3, "gold": 0.2})),
+    alpha=sbg.AlphaForecasts(expected_21d_returns, horizon_days=21),
+    risk=sbg.CovarianceHistory(daily_covariances),  # or a FactorRiskHistory
+    config=sbg.MarkowitzConfig(annual_vol_target=0.07, relative_l1_radius=1.0),
+    initial_portfolio=None,  # all cash; or sbg.InitialPortfolio.from_values(...)
 )
 result.evaluate(cash_reference=daily_cash_returns)
 ```
 
 Alpha and risk inputs can instead come from the built-in models, e.g.
-`sp.RidgeAlpha(...).forecast(prices, features)` and
-`sp.RollingSampleCovariance(window=...).estimate(prices)`, or
-`sp.run_markowitz_with_models(...)`. Fixed-weight and volatility-controlled
-fixed-weight benchmarks are available as `sp.run_fixed_weight` and
-`sp.run_vol_controlled_fixed_weight`.
+`sbg.RidgeAlpha(...).forecast(prices, features)` and
+`sbg.RollingSampleCovariance(window=...).estimate(prices)`, or
+`sbg.run_markowitz_with_models(...)`. Fixed-weight and volatility-controlled
+fixed-weight benchmarks are available as `sbg.run_fixed_weight` and
+`sbg.run_vol_controlled_fixed_weight`.
 
 Conventions:
 

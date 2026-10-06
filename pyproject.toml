@@ -1,5 +1,5 @@
 [project]
-name = "simple-portfolio"
+name = "stock-bond-gold-portfolios"
 version = "0.1.0"
 description = "Anchored volatility-limited Markowitz portfolios on prepared pandas inputs"
 readme = "README.md"
@@ -15,7 +15,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/simple_portfolio"]
+packages = ["src/sbg_portfolios"]
 
 [dependency-groups]
 dev = [

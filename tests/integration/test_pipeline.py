@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import simple_portfolio as sp
+import sbg_portfolios as sbg
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -79,21 +79,21 @@ class TestAlignment(unittest.TestCase):
         """Inputs for a short run."""
         cls.market, cls.features = EXAMPLE.synthetic_inputs(n_days=800)
         cls.start = cls.market.total_return_prices.index[300]
-        cls.baseline = sp.StaticBaseline(pd.Series({"equity_us": 0.5, "treasury": 0.5}))
+        cls.baseline = sbg.StaticBaseline(pd.Series({"equity_us": 0.5, "treasury": 0.5}))
         prices = cls.market.total_return_prices
-        cls.alpha = sp.EwmaAlpha(halflife=63).forecast(prices)
-        cls.risk = sp.RollingSampleCovariance(window=63).estimate(prices)
+        cls.alpha = sbg.EwmaAlpha(halflife=63).forecast(prices)
+        cls.risk = sbg.RollingSampleCovariance(window=63).estimate(prices)
 
-    def run_with(self, market, alpha=None, risk=None, **kwargs) -> sp.StrategyResult:
+    def run_with(self, market, alpha=None, risk=None, **kwargs) -> sbg.StrategyResult:
         """run_markowitz with the shared inputs."""
-        return sp.run_markowitz(market, self.baseline, alpha or self.alpha, risk or self.risk,
+        return sbg.run_markowitz(market, self.baseline, alpha or self.alpha, risk or self.risk,
                                 start=self.start, **kwargs)
 
     def test_permuting_asset_columns_permutes_nothing_else(self) -> None:
         """Every input is aligned by label to the market's order."""
         base = self.run_with(self.market)
         order = ["credit", "commodity", "treasury", "equity_em", "equity_us"]
-        shuffled = sp.MarketInputs(self.market.total_return_prices[order],
+        shuffled = sbg.MarketInputs(self.market.total_return_prices[order],
                                    self.market.cash_returns)
         other = self.run_with(shuffled)
         np.testing.assert_allclose(other.backtest.navs, base.backtest.navs, rtol=1e-7)
@@ -110,7 +110,7 @@ class TestAlignment(unittest.TestCase):
         decision_dates = self.run_with(self.market).decisions.index
         covariances = pd.concat({d: self.risk.covariance(d) for d in decision_dates},
                                 names=["date", "asset"])
-        via_cov = self.run_with(self.market, risk=sp.CovarianceHistory(covariances))
+        via_cov = self.run_with(self.market, risk=sbg.CovarianceHistory(covariances))
         via_factors = self.run_with(self.market)
         pd.testing.assert_frame_equal(via_cov.decisions, via_factors.decisions, atol=2e-4,
                                       check_exact=False)
@@ -120,21 +120,21 @@ class TestAlignment(unittest.TestCase):
         """Decision dates without forecasts or risk, or unknown baseline assets, are errors."""
         decision = self.run_with(self.market).decisions.index[3]
         with self.assertRaisesRegex(ValueError, "Alpha forecasts"):
-            self.run_with(self.market, alpha=sp.AlphaForecasts(
+            self.run_with(self.market, alpha=sbg.AlphaForecasts(
                 self.alpha.values.drop(decision), horizon_days=1))
         risk = self.risk
         kept = risk.dates != decision
-        thin = sp.FactorRiskHistory(risk.loadings.loc[risk.dates[kept]],
+        thin = sbg.FactorRiskHistory(risk.loadings.loc[risk.dates[kept]],
                                     risk.residual_std.loc[kept])
         with self.assertRaisesRegex(ValueError, "Risk history is missing"):
             self.run_with(self.market, risk=thin)
         with self.assertRaisesRegex(ValueError, "outside the investable universe"):
-            sp.run_markowitz(self.market, sp.StaticBaseline(pd.Series({"gold": 1.0})),
+            sbg.run_markowitz(self.market, sbg.StaticBaseline(pd.Series({"gold": 1.0})),
                              self.alpha, self.risk, start=self.start)
 
     def test_default_initial_state_is_all_cash(self) -> None:
         """``initial_portfolio=None`` equals an explicit all-cash state."""
-        cash_only = sp.InitialPortfolio.from_weights(pd.Series(dtype=float), cash_weight=1.0)
+        cash_only = sbg.InitialPortfolio.from_weights(pd.Series(dtype=float), cash_weight=1.0)
         a = self.run_with(self.market)
         b = self.run_with(self.market, initial_portfolio=cash_only)
         pd.testing.assert_series_equal(a.backtest.navs, b.backtest.navs)
@@ -146,7 +146,7 @@ class TestPackageBoundary(unittest.TestCase):
     def test_core_import_is_self_contained(self) -> None:
         """Importing the package pulls in none of the application dependencies."""
         code = (
-            "import sys, simple_portfolio, simple_portfolio.pipeline\n"
+            "import sys, sbg_portfolios, sbg_portfolios.pipeline\n"
             "bad = [m for m in ('yfinance', 'fredapi', 'matplotlib', 'experiments', 'tqdm')"
             " if m in sys.modules]\n"
             "assert not bad, bad\n"

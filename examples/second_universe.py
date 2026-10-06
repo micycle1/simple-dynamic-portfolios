@@ -12,7 +12,7 @@ Run from the repository root::
 import numpy as np
 import pandas as pd
 
-import simple_portfolio as sp
+import sbg_portfolios as sbg
 
 ASSETS = ["equity_us", "equity_em", "treasury", "credit", "commodity"]
 ANNUAL_VOLS = np.array([0.16, 0.22, 0.06, 0.08, 0.20])
@@ -25,7 +25,7 @@ CORRELATION = np.array([
 ])
 
 
-def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sp.MarketInputs, pd.DataFrame]:
+def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sbg.MarketInputs, pd.DataFrame]:
     """Correlated daily returns with a slowly varying, partly predictable drift."""
     rng = np.random.default_rng(seed)
     dates = pd.bdate_range("2010-01-04", periods=n_days, name="date")
@@ -42,41 +42,41 @@ def synthetic_inputs(n_days: int = 3000, seed: int = 7) -> tuple[sp.MarketInputs
     features["macro_state"] = regime
     for asset in ASSETS:
         features[f"trend_126d[{asset}]"] = prices[asset].pct_change(126, fill_method=None)
-    return sp.MarketInputs(prices, cash), features
+    return sbg.MarketInputs(prices, cash), features
 
 
-def ewma_covariance(prices: pd.DataFrame, halflife: int = 63) -> sp.CovarianceHistory:
+def ewma_covariance(prices: pd.DataFrame, halflife: int = 63) -> sbg.CovarianceHistory:
     """An externally prepared covariance history (here, an EWMA estimate)."""
     covariances = prices.pct_change(fill_method=None).dropna().ewm(halflife=halflife).cov()
     covariances.index.names = ["date", "asset"]
-    return sp.CovarianceHistory(covariances.dropna())
+    return sbg.CovarianceHistory(covariances.dropna())
 
 
-def run_example(n_days: int = 3000) -> dict[str, sp.StrategyResult]:
+def run_example(n_days: int = 3000) -> dict[str, sbg.StrategyResult]:
     """Forecast, estimate risk, allocate, simulate, and evaluate."""
     market, features = synthetic_inputs(n_days)
     start = market.total_return_prices.index[400]  # after model warm-up
-    baseline = sp.StaticBaseline(pd.Series({
+    baseline = sbg.StaticBaseline(pd.Series({
         "equity_us": 0.40, "equity_em": 0.10, "treasury": 0.35, "credit": 0.15,
     }))  # commodity is investable but has a zero baseline weight
-    initial = sp.InitialPortfolio.from_values(
+    initial = sbg.InitialPortfolio.from_values(
         pd.Series({"equity_us": 60_000.0, "treasury": 30_000.0}), cash_value=10_000.0)
-    config = sp.MarkowitzConfig(annual_vol_target=0.08, relative_l1_radius=0.5,
+    config = sbg.MarkowitzConfig(annual_vol_target=0.08, relative_l1_radius=0.5,
                                 rebalance_frequency="M", objective_horizon_days=21)
 
     results = {
-        "ridge + rolling risk": sp.run_markowitz_with_models(
+        "ridge + rolling risk": sbg.run_markowitz_with_models(
             market, baseline,
-            alpha_model=sp.RidgeAlpha(horizon_days=21, max_history=504, min_window=126),
-            risk_model=sp.RollingSampleCovariance(window=63),
+            alpha_model=sbg.RidgeAlpha(horizon_days=21, max_history=504, min_window=126),
+            risk_model=sbg.RollingSampleCovariance(window=63),
             features=features, config=config, initial_portfolio=initial, start=start),
-        "ewma + prepared covariance": sp.run_markowitz(
+        "ewma + prepared covariance": sbg.run_markowitz(
             market, baseline,
-            alpha=sp.EwmaAlpha(halflife=126).forecast(market.total_return_prices),
+            alpha=sbg.EwmaAlpha(halflife=126).forecast(market.total_return_prices),
             risk=ewma_covariance(market.total_return_prices),
             config=config, initial_portfolio=initial, start=start),
-        "baseline": sp.run_fixed_weight(market, baseline, rebalance_frequency="Q", start=start),
-        "baseline vol-controlled": sp.run_vol_controlled_fixed_weight(
+        "baseline": sbg.run_fixed_weight(market, baseline, rebalance_frequency="Q", start=start),
+        "baseline vol-controlled": sbg.run_vol_controlled_fixed_weight(
             market, baseline, annual_vol_target=0.08, vol_window=63, start=start),
     }
     return results

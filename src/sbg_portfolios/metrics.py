@@ -10,7 +10,7 @@ volatility, not the usual arithmetic Sharpe ratio (see ``arithmetic_sharpe``).
 import numpy as np
 import pandas as pd
 
-from simple_portfolio.simulator import BacktestResults
+from sbg_portfolios.simulator import BacktestResults
 
 
 def consistency(navs: pd.Series, periods_per_year: int = 252) -> float:
